@@ -1,0 +1,16 @@
+import { Activity, ArrowRight, BarChart3, CheckCircle2, Clock3, Plus, Ticket, UserRound } from "lucide-react";
+import { Link } from "react-router-dom";
+import PageTitle from "../components/PageTitle";
+import StatCard from "../components/StatCard";
+import { PriorityBadge, StatusBadge } from "../components/Badge";
+
+const tickets = [
+  { id: "#NS-1048", title: "Can’t access my account", category: "Access & permissions", status: "In progress", priority: "High", time: "12 min ago" },
+  { id: "#NS-1047", title: "VPN connection drops", category: "Technical issue", status: "Open", priority: "Medium", time: "48 min ago" },
+  { id: "#NS-1043", title: "Update billing details", category: "Billing", status: "Resolved", priority: "Low", time: "Yesterday" },
+];
+
+export default function DashboardPage() {
+  return <><PageTitle eyebrow="Monday, October 19, 2026" title="Good morning, Sam" description="Here’s what needs your attention today." action={<Link to="/tickets/new" className="button button-dark"><Plus size={16} /> New ticket</Link>} /><div className="stats-grid"><StatCard label="Total tickets" value="48" change="+12% this month" icon={Ticket} tone="blue" /><StatCard label="Open tickets" value="12" change="+3 since yesterday" icon={Clock3} tone="orange" /><StatCard label="In progress" value="08" change="4 assigned to you" icon={Activity} tone="purple" /><StatCard label="Resolved this month" value="28" change="+18% from last month" icon={CheckCircle2} tone="green" /></div><div className="dashboard-grid"><section className="panel ticket-panel"><div className="panel-header"><div><h2>Recent tickets</h2><p>Latest activity across your workspace</p></div><Link to="/tickets" className="text-link">View all <ArrowRight size={14} /></Link></div><TicketRows tickets={tickets} /></section><section className="panel workload-panel"><div className="panel-header"><div><h2>Your workload</h2><p>Assigned tickets by status</p></div><BarChart3 size={18} className="panel-muted-icon" /></div><div className="workload-chart"><div className="donut"><span>8<strong>assigned</strong></span></div><div className="legend"><p><i className="dot-blue" />In progress <b>4</b></p><p><i className="dot-orange" />Waiting for user <b>2</b></p><p><i className="dot-green" />Resolved <b>2</b></p></div></div><Link to="/tickets" className="button button-soft full-button">Open ticket queue <ArrowRight size={14} /></Link></section></div><section className="tip-banner"><span className="tip-icon"><UserRound size={18} /></span><div><strong>Keep your queue moving</strong><p>You have 2 tickets waiting for a customer response. A quick follow-up can unblock them.</p></div><Link to="/tickets" className="text-link">View waiting tickets <ArrowRight size={14} /></Link></section></>;
+}
+function TicketRows({ tickets: rows }) { return <div className="ticket-rows">{rows.map((ticket) => <Link to={`/tickets/${ticket.id.replace("#", "")}`} className="ticket-row" key={ticket.id}><span className="ticket-type"><Ticket size={16} /></span><span className="ticket-row-main"><strong>{ticket.title}</strong><small>{ticket.id} · {ticket.category}</small></span><StatusBadge status={ticket.status}>{ticket.status}</StatusBadge><PriorityBadge>{ticket.priority}</PriorityBadge><time>{ticket.time}</time><ArrowRight size={15} className="row-arrow" /></Link>)}</div>; }

@@ -1,0 +1,24 @@
+import { ArrowDownUp, Filter, Plus, Search, SlidersHorizontal } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useMemo, useState } from "react";
+import PageTitle from "../components/PageTitle";
+import { PriorityBadge, StatusBadge } from "../components/Badge";
+
+const allTickets = [
+  { id: "NS-1048", title: "Can’t access my account", requester: "Jamie Wilson", category: "Access & permissions", status: "In progress", priority: "High", assignee: "Sam Ortega", updated: "12 min ago" },
+  { id: "NS-1047", title: "VPN connection drops", requester: "Nina Patel", category: "Technical issue", status: "Open", priority: "Medium", assignee: "Unassigned", updated: "48 min ago" },
+  { id: "NS-1046", title: "New starter laptop request", requester: "Alex Chen", category: "Hardware", status: "Waiting for user", priority: "Low", assignee: "Sam Ortega", updated: "2 hrs ago" },
+  { id: "NS-1045", title: "Cannot access shared drive", requester: "Morgan Lee", category: "Access & permissions", status: "In progress", priority: "Critical", assignee: "Priya Shah", updated: "3 hrs ago" },
+  { id: "NS-1043", title: "Update billing details", requester: "Taylor Kim", category: "Billing", status: "Resolved", priority: "Low", assignee: "Sam Ortega", updated: "Yesterday" },
+  { id: "NS-1040", title: "Email forwarding not working", requester: "Jordan Blake", category: "Technical issue", status: "Closed", priority: "Medium", assignee: "Priya Shah", updated: "Oct 16" },
+];
+
+export default function TicketsPage() {
+  const [query, setQuery] = useState("");
+  const [status, setStatus] = useState("All statuses");
+  const [priority, setPriority] = useState("All priorities");
+  const [sortNewest, setSortNewest] = useState(true);
+  const [selected, setSelected] = useState([]);
+  const visible = useMemo(() => allTickets.filter((ticket) => (status === "All statuses" || ticket.status === status) && (priority === "All priorities" || ticket.priority === priority) && `${ticket.id} ${ticket.title} ${ticket.requester}`.toLowerCase().includes(query.toLowerCase())), [query, status, priority]);
+  return <><PageTitle eyebrow="Workspace queue" title="All tickets" description="Track, prioritize, and resolve every request." action={<Link to="/tickets/new" className="button button-dark"><Plus size={16} /> New ticket</Link>} /><div className="queue-toolbar"><div className="search-box wide"><Search size={17} /><input placeholder="Search tickets by ID, title, or requester" value={query} onChange={(event) => setQuery(event.target.value)} /></div><div className="queue-actions"><select value={status} onChange={(event) => setStatus(event.target.value)}><option>All statuses</option><option>Open</option><option>In progress</option><option>Waiting for user</option><option>Resolved</option><option>Closed</option></select><select value={priority} onChange={(event) => setPriority(event.target.value)}><option>All priorities</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select><button className="button button-soft" onClick={() => { setStatus("All statuses"); setPriority("All priorities"); setQuery(""); }}><Filter size={15} /> Clear filters</button><button className="icon-square"><SlidersHorizontal size={16} /></button></div></div><section className="panel queue-panel"><div className="queue-head"><label className="check-label"><input type="checkbox" onChange={(event) => setSelected(event.target.checked ? visible.map((ticket) => ticket.id) : [])} /> <span>{visible.length} tickets</span></label><button className="text-link" onClick={() => setSortNewest(!sortNewest)}><ArrowDownUp size={14} /> {sortNewest ? "Sort by latest" : "Sort by oldest"}</button></div><div className="queue-table"><div className="queue-table-heading"><span>Ticket</span><span>Requester</span><span>Status</span><span>Priority</span><span>Assignee</span><span>Updated</span></div>{visible.map((ticket) => <Link to={`/tickets/${ticket.id}`} className="queue-table-row" key={ticket.id}><label className="check-label" onClick={(event) => event.preventDefault()}><input type="checkbox" checked={selected.includes(ticket.id)} onChange={() => setSelected(selected.includes(ticket.id) ? selected.filter((id) => id !== ticket.id) : [...selected, ticket.id])} /></label><span className="queue-ticket"><b>#{ticket.id}</b><strong>{ticket.title}</strong><small>{ticket.category}</small></span><span className="requester-cell"><span className="tiny-avatar">{ticket.requester.split(" ").map((part) => part[0]).join("")}</span>{ticket.requester}</span><StatusBadge status={ticket.status}>{ticket.status}</StatusBadge><PriorityBadge>{ticket.priority}</PriorityBadge><span className="assignee-cell">{ticket.assignee}</span><time>{ticket.updated}</time></Link>)}</div>{visible.length === 0 && <div className="empty-state">No tickets match your filters.</div>}</section></>;
+}

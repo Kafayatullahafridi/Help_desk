@@ -1,0 +1,10 @@
+import { Router } from "express";
+import { stats, updateUser, users } from "../controllers/adminController.js";
+import { requireAuth, requireRoles } from "../middleware/auth.js";
+import asyncHandler from "../utils/asyncHandler.js";
+const router = Router();
+router.use(requireAuth, requireRoles("admin"));
+router.get("/stats", asyncHandler(stats));
+router.get("/users", asyncHandler(users));
+router.patch("/users/:id", asyncHandler(updateUser));
+export default router;

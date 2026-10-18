@@ -1,0 +1,15 @@
+import { Router } from "express";
+import { assign, comment, create, index, show, status } from "../controllers/ticketController.js";
+import { requireAuth, requireRoles } from "../middleware/auth.js";
+import { validate } from "../middleware/validate.js";
+import { assignmentSchema, commentSchema, statusSchema, ticketSchema } from "../validators/schemas.js";
+import asyncHandler from "../utils/asyncHandler.js";
+const router = Router();
+router.use(requireAuth);
+router.get("/", asyncHandler(index));
+router.post("/", validate(ticketSchema), asyncHandler(create));
+router.get("/:id", asyncHandler(show));
+router.post("/:id/comments", validate(commentSchema), asyncHandler(comment));
+router.patch("/:id/status", validate(statusSchema), asyncHandler(status));
+router.patch("/:id/assign", requireRoles("agent", "admin"), validate(assignmentSchema), asyncHandler(assign));
+export default router;
